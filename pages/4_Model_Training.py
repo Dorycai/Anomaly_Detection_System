@@ -1,7 +1,9 @@
 import streamlit as st
-import time
+import matplotlib.pyplot as plt
 import numpy as np
+import time
 
+# 设置页面标题
 st.set_page_config(page_title="模型训练", page_icon="🔧")
 
 st.markdown("# 模型训练")
@@ -43,22 +45,55 @@ start_training = st.sidebar.button("开始训练")
 # 右侧显示训练过程
 st.markdown("### 实时训练监控")
 
-# 模拟训练过程中的 loss 和 accuracy 更新
+# 创建两个列区域
+col1, col2 = st.columns(2)
+
+# 创建显示 loss 和 accuracy 曲线的区域
+loss_placeholder = col1.empty()
+acc_placeholder = col2.empty()
+
+# 初始化 loss 和 accuracy 曲线数据
+loss_values = []
+accuracy_values = []
+
+# 创建显示 loss 和 accuracy 数值的区域
+loss_chart = col1.empty()
+acc_chart = col2.empty()
+
+# 模拟训练过程
 if start_training:
     st.write(f"正在使用模型 {selected_model} 进行训练...")
 
-    # 创建一个区域来显示 loss 和 accuracy
-    progress_bar = st.progress(0)
-    loss_chart = st.empty()  # 用于显示实时 loss
-    acc_chart = st.empty()  # 用于显示实时 accuracy
-
-    # 模拟训练过程，后期接train的后端算法
+    # 训练过程
     for epoch in range(1, epochs + 1):
         loss = np.random.rand() * 0.1  # 模拟 loss 下降
         accuracy = np.random.rand() * 100  # 模拟 accuracy 增加
 
-        # 更新进度条和 loss/accuracy 显示
-        progress_bar.progress(epoch / epochs)
+        # 更新 loss 和 accuracy 曲线数据
+        loss_values.append(loss)
+        accuracy_values.append(accuracy)
+
+        # 绘制 loss 曲线
+        plt.figure(figsize=(6, 4))
+        plt.cla()  # 清除上一图像
+        plt.plot(range(1, len(loss_values) + 1), loss_values, color='blue', label='Training Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Training Loss Curve')
+        plt.legend()
+        loss_placeholder.pyplot(plt)  # 在左侧动态显示 loss 曲线
+
+        # 绘制 accuracy 曲线
+        plt.figure(figsize=(6, 4))
+        plt.cla()  # 清除上一图像
+        plt.plot(range(1, len(accuracy_values) + 1), accuracy_values, color='green', label='Training Accuracy')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy (%)')
+        plt.title('Training Accuracy Curve')
+        plt.legend()
+        acc_placeholder.pyplot(plt)  # 在右侧动态显示 accuracy 曲线
+
+        # 更新 loss 和 accuracy 信息显示
         loss_chart.write(f"Epoch {epoch}/{epochs} - Loss: {loss:.4f}")
         acc_chart.write(f"Epoch {epoch}/{epochs} - Accuracy: {accuracy:.2f}%")
 
